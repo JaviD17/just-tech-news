@@ -24,7 +24,7 @@ router.get('/:id', (req, res) => {
     })
         .then(dbUserData => {
             if (!dbUserData) {
-                res.status(404).json({ message: 'No user found with this id'});
+                res.status(404).json({ message: 'No user found with this id' });
                 return;
             }
             res.json(dbUserData);
@@ -50,6 +50,33 @@ router.post('/', (req, res) => {
         });
 });
 
+router.post('/login', (req, res) => {
+    // expect {email: 'lernantino@gmail.com', password: 'password1234'}
+    User.findOne({
+        where: {
+            email: req.body.email
+        }
+    })
+        .then(dbUserData => {
+            if (!dbUserData) {
+                res.status(400).json({ message: 'No user with that email address!' });
+                return;
+            }
+
+            // verify user
+            const validPassword = dbUserData.checkPassword(req.body.password);
+            if (!validPassword) {
+                res.status(400).json({ message: 'Incorrect password' });
+                return;
+            }
+            
+            res.json({
+                user: dbUserData,
+                message: 'You are now logged in'
+            });
+        });
+});
+
 // PUT /api/users/1
 router.put('/:id', (req, res) => {
     // expects {username: 'Lernantino, email: 'lernantino@gmail.com', password: 'password1234'}
@@ -63,7 +90,7 @@ router.put('/:id', (req, res) => {
     })
         .then(dbUserData => {
             if (!dbUserData) {
-                res.status(404).json({ message: 'No user found with this id'});
+                res.status(404).json({ message: 'No user found with this id' });
                 return;
             }
             res.json(dbUserData);
@@ -83,7 +110,7 @@ router.delete('/:id', (req, res) => {
     })
         .then(dbUserData => {
             if (!dbUserData) {
-                res.status(404).json({ message: 'No user found with this id'});
+                res.status(404).json({ message: 'No user found with this id' });
                 return;
             }
             res.json(dbUserData);
